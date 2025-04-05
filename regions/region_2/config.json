@@ -1,0 +1,16 @@
+{
+  "region": "region_2",
+  "settings": {
+    "service": "example_service",
+    "version": "1.0",
+    "enabled": true,
+    "parameters": {
+      "timeout": 30,
+      "retry": 3
+    }
+  },
+  "credentials": {
+    "api_key": "your_api_key_here",
+    "secret": "your_secret_here"
+  }
+}
