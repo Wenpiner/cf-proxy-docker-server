@@ -44,7 +44,7 @@
 1. 克隆仓库或下载源代码到本地
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Wenpiner/cf-proxy-docker-server.git
 cd cloudflare-proxy-docker
 ```
 
@@ -232,13 +232,3 @@ CMD="cloudflared access rdp --hostname \"$HOSTNAME\" --url \"rdp://$TARGET\" --l
 - 添加容器运行状态监控
 - 优化时区设置
 - 添加更多网络诊断工具
-
-## 版本信息
-
-- 版本：1.0.0
-- 最后更新：2025-04-05
-- Cloudflared 版本：最新稳定版
-
-## 许可证
-
-[添加许可证信息]
