@@ -1,0 +1,12 @@
+services:
+  cloudflared-region_1:
+    build: .
+    volumes:
+      - ./regions/region_1/credentials:/root/.cloudflared
+      - ./regions/region_1/config.json:/app/config/tunnels.json
+      - ./regions/region_1/log/:/app/logs
+    network_mode: "host"  # 使用主机网络以支持任意端口
+    restart: unless-stopped
+    container_name: cloudflared-region_1
+
+  # 可以根据需要添加更多区域或账号

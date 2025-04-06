@@ -1,11 +1,11 @@
 {
   "tunnels": [
     {
-      "name": "mysql",
-      "hostname": "xxx.xxx.com",
+      "name": "test",
+      "hostname": "test.com",
       "target": "0.0.0.0",
       "protocol": "tcp",
-      "local_port": 3306
+      "local_port": 1233
     }
   ]
 }
