@@ -46,8 +46,8 @@ This is a Docker-based solution that uses the Cloudflared tool to create and man
 1. Clone the repository or download the source code
 
 ```bash
-git clone https://github.com/Wenpiner/cf-proxy-docker-server.git
-cd cloudflare-proxy-docker
+git clone https://github.com/Wenpiner/cf-proxy-docker.git
+cd cf-proxy-docker
 ```
 
 2. Create configuration folders for each region you need to deploy

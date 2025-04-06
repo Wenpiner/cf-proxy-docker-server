@@ -46,8 +46,8 @@
 1. 克隆仓库或下载源代码到本地
 
 ```bash
-git clone https://github.com/Wenpiner/cf-proxy-docker-server.git
-cd cloudflare-proxy-docker
+git clone https://github.com/Wenpiner/cf-proxy-docker.git
+cd cf-proxy-docker
 ```
 
 2. 为每个需要部署的区域创建配置文件夹
