@@ -143,28 +143,28 @@ do
     
     PROGRAM_NAME="tunnel_${i}_${TUNNEL_NAME}"
     
-    log "配置隧道 #$i: $TUNNEL_NAME, 协议: $PROTOCOL, 主机名: $HOSTNAME, 目标: $TARGET, 本地端口: $LOCAL_PORT"
+    log "配置隧道 #$i: $TUNNEL_NAME, 协议: $PROTOCOL, 主机名: $HOSTNAME, 本地: $PROTOCOL://$TARGET:$LOCAL_PORT"
     
     # 根据协议创建相应的命令
     case "$PROTOCOL" in
         "rdp")
-            CMD="cloudflared access rdp --hostname \"$HOSTNAME\" --url \"rdp://$TARGET\" --local-port $LOCAL_PORT"
+            CMD="cloudflared access rdp --hostname $HOSTNAME --url rdp://$TARGET:$LOCAL_PORT"
             ;;
         "ssh")
-            CMD="cloudflared access ssh --hostname \"$HOSTNAME\" --url \"ssh://$TARGET\" --local-port $LOCAL_PORT"
+            CMD="cloudflared access ssh --hostname $HOSTNAME --url ssh://$TARGET:$LOCAL_PORT"
             ;;
         "http")
-            CMD="cloudflared access http --hostname \"$HOSTNAME\" --url \"http://$TARGET\" --local-port $LOCAL_PORT"
+            CMD="cloudflared access http --hostname $HOSTNAME --url http://$TARGET:$LOCAL_PORT"
             ;;
         "https")
-            CMD="cloudflared access http --hostname \"$HOSTNAME\" --url \"https://$TARGET\" --local-port $LOCAL_PORT"
+            CMD="cloudflared access http --hostname $HOSTNAME --url https://$TARGET:$LOCAL_PORT"
             ;;
         "tcp")
-            CMD="cloudflared access tcp --hostname \"$HOSTNAME\" --url \"tcp://$TARGET\" --local-port $LOCAL_PORT"
+            CMD="cloudflared access tcp --hostname $HOSTNAME --url tcp://$TARGET:$LOCAL_PORT"
             ;;
         *)
             log "警告: 不支持的协议 '$PROTOCOL'，将使用 TCP 协议"
-            CMD="cloudflared access tcp --hostname \"$HOSTNAME\" --url \"tcp://$TARGET\" --local-port $LOCAL_PORT"
+            CMD="cloudflared access tcp --hostname $HOSTNAME --url tcp://$TARGET:$LOCAL_PORT"
             ;;
     esac
     

@@ -1,11 +1,11 @@
 {
   "tunnels": [
     {
-      "name": "postgresql",
-      "hostname": "ser.caidev.top",
-      "target": "127.0.0.1:5432",
+      "name": "mysql",
+      "hostname": "xxx.xxx.com",
+      "target": "0.0.0.0",
       "protocol": "tcp",
-      "local_port": 5432
+      "local_port": 3306
     }
   ]
 }

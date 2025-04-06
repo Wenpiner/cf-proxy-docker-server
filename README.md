@@ -1,62 +1,64 @@
-# Cloudflared 代理 Docker 解决方案
+# Cloudflared Proxy Docker Solution
 
-这是一个基于 Docker 的解决方案，使用 Cloudflared 工具创建和管理多个 Cloudflare Access 隧道，以便通过 Cloudflare 安全地访问内部网络中的各种服务。该解决方案支持多个协议、多个端口、多个 Cloudflare 账户和区域。
+English | [简体中文](README_zh.md)
 
-## 功能特性
+This is a Docker-based solution that uses the Cloudflared tool to create and manage multiple Cloudflare Access tunnels for securely accessing various services in your internal network through Cloudflare. This solution supports multiple protocols, multiple ports, multiple Cloudflare accounts, and regions, and provides comprehensive health checks and monitoring functions.
 
-- **多协议支持**：支持 TCP、HTTP/HTTPS、SSH、RDP 等多种协议
-- **任意端口支持**：能够映射到任意本地端口，支持同时运行多个不同端口的隧道
-- **多账户管理**：支持同时配置和使用多个 Cloudflare 账户
-- **多区域部署**：支持在不同地区同时运行 Cloudflared 实例
-- **配置简单**：使用 JSON 格式定义所有隧道配置，无需修改代码即可添加、删除或修改隧道
-- **自动容错**：单个隧道故障时自动重启，容器意外停止时自动恢复
-- **完整日志**：所有隧道日志统一输出到区域日志文件，便于故障排查
+## Features
 
-## 目录结构
+- **Multiple Protocol Support**: Supports various protocols including TCP, HTTP/HTTPS, SSH, RDP, etc.
+- **Arbitrary Port Support**: Ability to map to any local port, supporting simultaneous operation of multiple tunnels on different ports
+- **Multi-Account Management**: Support for configuring and using multiple Cloudflare accounts simultaneously
+- **Multi-Region Deployment**: Support for running Cloudflared instances in different regions simultaneously
+- **Simple Configuration**: Uses JSON format to define all tunnel configurations, allowing adding, removing, or modifying tunnels without code changes
+- **Automatic Fault Tolerance**: Auto-restart when individual tunnels fail, auto-recovery when containers stop unexpectedly
+- **Complete Logging**: All tunnel logs are unified in regional log files for easy troubleshooting
+
+## Directory Structure
 
 ```
 .
-├── Dockerfile
-├── start.sh
-├── docker-compose.yml
-├── README.md
-└── regions/
-    ├── region_1/
-    │   ├── credentials/  # Cloudflare 凭证
-    │   ├── config.json   # 隧道配置文件
-    │   └── log.txt       # 日志文件
-    └── region_2/
-        ├── credentials/
-        ├── config.json
-        └── log.txt
+├── Dockerfile            # Container build file
+├── start.sh              # Startup script
+├── docker-compose.yml    # Docker Compose configuration file
+├── README.md             # Project documentation
+└── regions/              # Region configuration directory
+    ├── region_1/         # Region 1
+    │   ├── credentials/  # Cloudflare credentials
+    │   ├── config.json   # Tunnel configuration file
+    │   └── log/          # Log directory
+    └── region_2/         # Region 2
+        ├── credentials/  # Cloudflare credentials
+        ├── config.json   # Tunnel configuration file
+        └── log/          # Log directory (or log.txt file)
 ```
 
-## 快速开始
+## Quick Start
 
-### 前提条件
+### Prerequisites
 
-- 安装 Docker 和 Docker Compose
-- 拥有 Cloudflare 账户
-- 拥有可以使用 Cloudflare Tunnel 的域名
+- Docker and Docker Compose installed
+- Cloudflare account
+- Domain that can be used with Cloudflare Tunnel
 
-### 配置步骤
+### Configuration Steps
 
-1. 克隆仓库或下载源代码到本地
+1. Clone the repository or download the source code
 
 ```bash
 git clone https://github.com/Wenpiner/cf-proxy-docker-server.git
 cd cloudflare-proxy-docker
 ```
 
-2. 为每个需要部署的区域创建配置文件夹
+2. Create configuration folders for each region you need to deploy
 
 ```bash
-# 已经预创建了 region_1 和 region_2
+# region_1 and region_2 are pre-created
 mkdir -p regions/region_1/credentials
 mkdir -p regions/region_2/credentials
 ```
 
-3. 编辑每个区域的 config.json 文件
+3. Edit the config.json file for each region
 
 ```json
 {
@@ -79,35 +81,35 @@ mkdir -p regions/region_2/credentials
 }
 ```
 
-4. 启动服务
+4. Start the service
 
 ```bash
 docker-compose up -d
 ```
 
-5. 首次启动时，您需要登录 Cloudflare 账户
+5. For the first time startup, you need to log in to your Cloudflare account
 
 ```bash
-# 查看日志，按照提示进行登录
+# View logs and follow login instructions
 docker logs cloudflared-region1
 
-# 如果需要，可以通过下面命令进入容器完成交互式登录
+# If needed, you can enter the container to complete interactive login
 docker exec -it cloudflared-region1 bash
 cloudflared login
 exit
 ```
 
-### 配置文件详解
+### Configuration File Details
 
-每个隧道配置包含以下字段：
+Each tunnel configuration includes the following fields:
 
-- `name`：隧道名称，用于标识和日志记录
-- `hostname`：Cloudflare 域名，必须是您在 Cloudflare 上注册并授权的域名
-- `target`：目标服务地址和端口，格式为 `IP:PORT`
-- `protocol`：协议类型，支持 "rdp", "ssh", "http", "https", "tcp"
-- `local_port`：本地监听端口，确保该端口在本地未被占用
+- `name`: Tunnel name, used for identification and logging
+- `hostname`: Cloudflare domain, must be a domain registered and authorized on Cloudflare
+- `target`: Target service address and port, in the format `IP:PORT`
+- `protocol`: Protocol type, supports "rdp", "ssh", "http", "https", "tcp"
+- `local_port`: Local listening port, ensure this port is not in use locally
 
-### Docker Compose 配置详解
+### Docker Compose Configuration Details
 
 ```yaml
 version: '3'
@@ -116,119 +118,154 @@ services:
   cloudflared-region1:
     build: .
     volumes:
-      - ./regions/region_1/credentials:/etc/cloudflared
+      - ./regions/region_1/credentials:/root/.cloudflared
       - ./regions/region_1/config.json:/app/config/tunnels.json
-      - ./regions/region_1/log.txt:/app/logs/supervisor.log
-    network_mode: "host"
+      - ./regions/region_1/log/:/app/logs
+    network_mode: "host"  # Use host network to support arbitrary ports
     restart: unless-stopped
     container_name: cloudflared-region1
 
   cloudflared-region2:
     build: .
     volumes:
-      - ./regions/region_2/credentials:/etc/cloudflared
+      - ./regions/region_2/credentials:/root/.cloudflared
       - ./regions/region_2/config.json:/app/config/tunnels.json
       - ./regions/region_2/log.txt:/app/logs/supervisor.log
-    network_mode: "host"
+    network_mode: "host"  # Use host network to support arbitrary ports
     restart: unless-stopped
     container_name: cloudflared-region2
 ```
 
-可以根据需要添加更多区域或账号。
+You can add more regions or accounts as needed. Note that region1 uses directory mounting for logs, while region2 uses single file mounting for the main log.
 
-## 管理操作
+## Management Operations
 
-### 查看日志
+### View Logs
 
 ```bash
-# 查看特定区域的主日志
+# View the main log for a specific region
 docker exec -it cloudflared-region1 cat /app/logs/supervisor.log
 
-# 查看特定隧道的日志
-docker exec -it cloudflared-region1 cat /app/logs/tunnels/rdp-server/rdp-server.log
+# View logs for a specific tunnel
+docker exec -it cloudflared-region1 cat /app/logs/tunnels/mysql/mysql.log
+
+# View error logs
+docker exec -it cloudflared-region1 cat /app/logs/tunnels/mysql/mysql_err.log
+
+# View health check logs
+docker exec -it cloudflared-region1 cat /app/logs/healthcheck.log
 ```
 
-### 重启服务
+### Restart Service
 
 ```bash
-# 重启特定区域的所有隧道
+# Restart all tunnels in a specific region
 docker restart cloudflared-region1
 
-# 仅重启特定隧道
+# Restart only a specific tunnel
 docker exec -it cloudflared-region1 supervisorctl restart tunnel_0_rdp-server
 ```
 
-### 添加新隧道
+### Add New Tunnel
 
-1. 编辑对应区域的 config.json 文件，添加新的隧道配置
-2. 重启对应的容器
-
-```bash
-docker restart cloudflared-region1
-```
-
-### 删除隧道
-
-1. 编辑对应区域的 config.json 文件，删除不需要的隧道配置
-2. 重启对应的容器
+1. Edit the config.json file for the corresponding region, add the new tunnel configuration
+2. Restart the corresponding container
 
 ```bash
 docker restart cloudflared-region1
 ```
 
-## 故障排查
+### Delete Tunnel
 
-### 无法连接到 Cloudflare
+1. Edit the config.json file for the corresponding region, remove the unwanted tunnel configuration
+2. Restart the corresponding container
 
-- 检查凭证文件是否正确：`/etc/cloudflared/cert.pem`
-- 尝试重新登录：`cloudflared login`
-- 检查网络连接
+```bash
+docker restart cloudflared-region1
+```
 
-### 隧道无法启动
+## Troubleshooting
 
-- 查看特定隧道的错误日志：`/app/logs/tunnels/[隧道名称]/[隧道名称]_err.log`
-- 检查配置文件中的参数是否正确
-- 确保本地端口没有被占用：`netstat -tuln | grep [端口号]`
+### Cannot Connect to Cloudflare
 
-### 无法访问服务
+- Check if the credential file is correct: `/etc/cloudflared/cert.pem`
+- Try logging in again: `cloudflared login`
+- Check network connection
 
-- 确保隧道正在运行：`supervisorctl status tunnel_[序号]_[隧道名称]`
-- 检查目标服务是否正常运行
-- 检查防火墙设置
-- 查看 Cloudflare 仪表盘中隧道的状态
+### Tunnel Cannot Start
 
-## 安全建议
+- Check the error log for the specific tunnel: `/app/logs/tunnels/[tunnel_name]/[tunnel_name]_err.log`
+- Verify that the parameters in the configuration file are correct
+- Ensure that the local port is not being used: `netstat -tuln | grep [port]`
 
-- 使用独立的 Cloudflare 账户管理隧道
-- 定期更新 Cloudflared 版本
-- 在 Cloudflare 控制台为隧道设置访问策略
-- 避免将敏感信息直接写入配置文件
-- 限制容器的资源访问权限
+### Cannot Access Service
 
-## 高级配置
+- Ensure the tunnel is running: `supervisorctl status tunnel_[index]_[tunnel_name]`
+- Check if the target service is running properly
+- Check firewall settings
+- View the tunnel status in the Cloudflare dashboard
 
-### 自定义超时时间
+## Security Recommendations
 
-修改 start.sh 脚本中的 cloudflared 命令，添加超时参数：
+- Use separate Cloudflare accounts to manage tunnels
+- Regularly update Cloudflared version
+- Set access policies for tunnels in the Cloudflare console
+- Avoid writing sensitive information directly into configuration files
+- Limit container resource access permissions
+
+## Advanced Configuration
+
+### Custom Timeout
+
+Modify the cloudflared command in the start.sh script by adding a timeout parameter:
 
 ```bash
 CMD="cloudflared access rdp --hostname \"$HOSTNAME\" --url \"rdp://$TARGET\" --local-port $LOCAL_PORT --timeout 10m"
 ```
 
-### 自定义日志级别
+### Custom Log Level
 
-修改 start.sh 脚本中的 cloudflared 命令，添加日志级别参数：
+Modify the cloudflared command in the start.sh script by adding a log level parameter:
 
 ```bash
 CMD="cloudflared access rdp --hostname \"$HOSTNAME\" --url \"rdp://$TARGET\" --local-port $LOCAL_PORT --loglevel debug"
 ```
 
-## 更新说明
+## Container Features
 
-- 优化 Docker 镜像，减少大小并提高安全性
-- 增强错误处理和恢复机制
-- 改进日志结构和管理
-- 增加健康检查功能
-- 添加容器运行状态监控
-- 优化时区设置
-- 添加更多网络诊断工具
+The container includes the following main features:
+
+- **Multiple Protocol Support**: Supports RDP, SSH, HTTP, HTTPS, TCP, and other protocols
+- **Automatic Restart Mechanism**: Manages tunnel processes through Supervisor, automatically restarts failed tunnels
+- **Health Check**: Built-in health check mechanism executed every 5 minutes
+- **Complete Logging System**: Manages standard output and error logs separately for each tunnel
+- **Error Handling**: Comprehensive error handling and reporting mechanisms
+- **Timezone Setting**: Default set to Asia/Shanghai timezone
+- **Network Diagnostic Tools**: Built-in ping, netstat, and other network diagnostic tools
+- **Multi-Architecture Support**: Supports deployment on various CPU architectures
+
+## Dockerfile Description
+
+The Dockerfile includes the following main features:
+
+```
+FROM ubuntu:22.04
+# Install necessary tools and dependencies
+# Set timezone to Asia/Shanghai
+# Install the latest version of cloudflared, supporting multiple architectures
+# Set up health checks
+# Set environment variables and working directory
+```
+
+## Update Notes
+
+Latest version (1.0.0) updates:
+
+- Optimized Docker image, reduced size and improved security
+- Enhanced error handling and recovery mechanisms
+- Improved log structure and management
+- Added health check functionality
+- Added container status monitoring
+- Optimized timezone settings (default Asia/Shanghai)
+- Added more network diagnostic tools
+- Support for multi-architecture deployment
